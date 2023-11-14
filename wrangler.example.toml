@@ -1,0 +1,16 @@
+name = "upload"
+main = "src/index.ts"
+compatibility_date = "2023-10-25"
+node_compat = true
+
+account_id = "1234" # ← Replace with your Account ID.
+workers_dev = true
+
+kv_namespaces = [
+    { binding = "x57_db", id = "1234", preview_id = "5678" } # ← Replace with your KV Namespace ID.
+]
+
+[[r2_buckets]]
+binding = 'x57_bucket'
+bucket_name = 'x57-dev'
+preview_bucket_name = 'x57-dev-preview'
