@@ -21,7 +21,7 @@ export default {
                 let tokencsv = await env.x57_db.get('_tokens');
                 if (tokencsv === null) {
                     console.log('no tokens');
-                    return new Response('', { status: 401 });
+                    return new Response('', { status: 500 });
                 }
 
                 let tokens = tokencsv.split(',');
@@ -39,14 +39,23 @@ export default {
 
                 await env.x57_bucket.put(rngName, request.body);
 
+                let extension = '';
                 if (url.searchParams.get('name') !== null) {
                     await env.x57_db.put(rngName, url.searchParams.get('name')!);
+                    let split = url.searchParams.get('name')!.split('.');
+                    if (split.length > 1) {
+                        extension = '.' + split.slice(-1)[0];
+                    }
                 }
 
-                return new Response(url.origin + '/' + rngName);
+                return new Response(url.origin + '/' + rngName + extension, { status: 201 });
 
             case 'GET':
                 let key = url.pathname.slice(1);
+                let split = key.split('.');
+                if (split.length > 1) {
+                    key = split.slice(0, -1).join('.');
+                }
                 let object = await env.x57_bucket.get(key);
 
                 if (object === null) {
@@ -71,7 +80,8 @@ export default {
                 headers.set('content-disposition', 'inline; filename="' + name + '"');
 
                 return new Response(object.body, {
-                    headers,
+                    headers: headers,
+                    status: 200,
                 });
 
             default:
